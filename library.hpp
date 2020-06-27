@@ -10,15 +10,19 @@ void draw(const int& x, std::ostream& out, size_t position){
 
 class object_t{
 public:
-  explicit object_t(const int& x) : self_(std::make_unique<int_model_t>(x)) { }
+  object_t(const int& x) : self_(std::make_unique<int_model_t>(x)) {
+    std::cout << "ctor" << std::endl;
+  }
 
   // copy constructor - new object equal to and logically disjoint from, the original
-  object_t(const object_t& x) : self_(std::make_unique<int_model_t>(*x.self_)) { }
+  object_t(const object_t& x) : self_(std::make_unique<int_model_t>(*x.self_)) {
+    std::cout << "copy" << std::endl;
+  }
 
   // assignment consistent with copy. Satisfies the 'strong exception guarantee'.
-  object_t& operator=(const object_t& x){
-    object_t tmp(x);
-    self_ = std::move(tmp.self_);
+  // pass sink arguments by value and swap or move into place
+  object_t& operator=(object_t x){
+    self_ = std::move(x.self_);
     return *this;
   }
 
