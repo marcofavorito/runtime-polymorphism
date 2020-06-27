@@ -3,6 +3,7 @@
 #include <ostream>
 #include <memory>
 #include <vector>
+#include <cassert>
 
 template <typename T>
 void draw(const T& x, std::ostream& out, size_t position){
@@ -16,6 +17,7 @@ public:
 
   // copy constructor - new object equal to and logically disjoint from, the original
   object_t(const object_t& x) : self_(x.self_->copy_()) {
+    std::cout << "copy" << std::endl;
   }
   // default move constructor
   // object_t (object_t&& x) noexcept : self_(std::move(x.self_)) { }
@@ -60,3 +62,9 @@ void draw(const document_t& x, std::ostream& out, size_t position){
   for (const auto& e: x) draw(e, out, position + 2);
   out << std::string(position, ' ') << "</document>" << std::endl;
 }
+
+using history_t = std::vector<document_t>;
+
+void commit(history_t& x) { assert(x.size()); x.push_back(x.back());}
+void undo(history_t& x) { assert(x.size()); x.pop_back();}
+document_t& current(history_t& x) { assert(x.size()); return x.back(); }
