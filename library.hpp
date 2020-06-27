@@ -4,17 +4,15 @@
 #include <memory>
 #include <vector>
 
-void draw(const int& x, std::ostream& out, size_t position){
-  out << std::string(position, ' ') << x << std::endl;
-}
-void draw(const std::string& x, std::ostream& out, size_t position){
+template <typename T>
+void draw(const T& x, std::ostream& out, size_t position){
   out << std::string(position, ' ') << x << std::endl;
 }
 
 class object_t{
 public:
-  object_t(std::string x) : self_(std::make_unique<string_model_t>(std::move(x))) { }
-  object_t(int x) : self_(std::make_unique<int_model_t>(std::move(x))) { }
+  template <typename T>
+  object_t(T x) : self_(std::make_unique<model<T>>(std::move(x))) { }
 
   // copy constructor - new object equal to and logically disjoint from, the original
   object_t(const object_t& x) : self_(x.self_->copy_()) {
@@ -41,25 +39,16 @@ private:
     virtual void draw_(std::ostream&, size_t) const = 0;
     virtual std::unique_ptr<concept_t> copy_() const = 0;
   };
-  struct string_model_t final : concept_t {
-    string_model_t(std::string x) : data_(std::move(x)) { }
-    virtual std::unique_ptr<concept_t> copy_() const override{
-      return std::make_unique<string_model_t>(*this);
+  template <typename T>
+  struct model final : concept_t {
+    model(T x) : data_(std::move(x)) { }
+    std::unique_ptr<concept_t> copy_() const override {
+      return std::make_unique<model>(*this);
     }
-    virtual void draw_(std::ostream& out, size_t position) const override {
+    void draw_(std::ostream& out, size_t position) const override {
       draw(data_, out, position);
     }
-    std::string data_;
-  };
-  struct int_model_t final : concept_t {
-    int_model_t(int x) : data_(std::move(x)) { }
-    virtual void draw_(std::ostream& out, size_t position) const override {
-      draw(data_, out, position);
-    }
-    virtual std::unique_ptr<concept_t> copy_() const override{
-      return std::make_unique<int_model_t>(*this);
-    }
-    int data_;
+    T data_;
   };
   std::unique_ptr<concept_t > self_;
 };
