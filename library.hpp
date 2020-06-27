@@ -10,13 +10,11 @@ void draw(const int& x, std::ostream& out, size_t position){
 
 class object_t{
 public:
-  object_t(const int& x) : self_(std::make_unique<int_model_t>(x)) {
-    std::cout << "ctor" << std::endl;
+  object_t(int x) : self_(std::make_unique<int_model_t>(std::move(x))) {
   }
 
   // copy constructor - new object equal to and logically disjoint from, the original
   object_t(const object_t& x) : self_(std::make_unique<int_model_t>(*x.self_)) {
-    std::cout << "copy" << std::endl;
   }
   // default move constructor
   // object_t (object_t&& x) noexcept : self_(std::move(x.self_)) { }
@@ -36,7 +34,7 @@ public:
 
 private:
   struct int_model_t {
-    int_model_t(const int& x) : data_(x) { }
+    int_model_t(int x) : data_(std::move(x)) { }
     void draw_(std::ostream& out, size_t position) const{
       draw(data_, out, position);
     }
