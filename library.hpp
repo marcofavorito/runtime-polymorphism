@@ -26,6 +26,10 @@ public:
     return *this;
   }
 
+  // default move constructor
+  // object_t (object_t&& x) noexcept : self_(std::move(x.self_)) { }
+  object_t (object_t&& x) noexcept = default;
+
   friend void draw(const object_t& x, std::ostream& out, size_t position){
     x.self_->draw_(out, position);
   }
