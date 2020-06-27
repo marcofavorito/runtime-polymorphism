@@ -18,17 +18,17 @@ public:
   object_t(const object_t& x) : self_(std::make_unique<int_model_t>(*x.self_)) {
     std::cout << "copy" << std::endl;
   }
-
-  // assignment consistent with copy. Satisfies the 'strong exception guarantee'.
-  // pass sink arguments by value and swap or move into place
-  object_t& operator=(object_t x){
-    self_ = std::move(x.self_);
-    return *this;
-  }
-
   // default move constructor
   // object_t (object_t&& x) noexcept : self_(std::move(x.self_)) { }
   object_t (object_t&& x) noexcept = default;
+
+  // assignment consistent with copy. Satisfies the 'strong exception guarantee'.
+  // pass sink arguments by value and swap or move into place
+  object_t& operator=(const object_t& x){
+    return *this = object_t(x);
+  }
+  // core issue 1402
+  object_t& operator=(object_t&&) noexcept = default;
 
   friend void draw(const object_t& x, std::ostream& out, size_t position){
     x.self_->draw_(out, position);
