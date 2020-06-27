@@ -1,5 +1,6 @@
 #include <iostream>
 #include <algorithm>
+#include <future>
 #include "library.hpp"
 
 class my_class_t {
@@ -23,6 +24,13 @@ int main(){
   commit(h);
 
   current(h)[0] = 42.5;
+
+  auto saving = std::async([document = current(h)]() {
+    std::this_thread::sleep_for(std::chrono::seconds(3));
+    std::cout << "----- 'save' -----" << std::endl;
+    draw(document, std::cout, 0);
+  });
+
   current(h)[1] = std::string("World");
   current(h).emplace_back(current(h));
   current(h).emplace_back(my_class_t());
